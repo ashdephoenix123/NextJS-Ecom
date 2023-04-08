@@ -1,0 +1,53 @@
+.allCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-gap: 2rem;
+
+    @media only screen and (max-width: 467px) {
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    }
+
+}
+.productTitle{
+    text-align: center;
+    font-size: 2rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.card {
+    box-shadow: 0 .5rem 1rem 0 rgba(0, 0, 0, 0.2);
+    transition: box-shadow .2s ease-in-out;
+
+    &Image {
+        width: 100%;
+        max-height: 25rem;
+        object-fit: cover;
+    }
+
+    &Content {
+        padding: 1rem;
+
+        h3 {
+            color: var(--color-grey1);
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            font-weight: bold;
+        }
+
+        span {
+            color: var(--color-grey3);
+        }
+
+        p {
+            color: var(--color-grey3);
+            font-size: 1.2rem;
+        }
+    }
+
+    &:hover {
+        box-shadow: 0 1rem 2rem 0 rgba(0, 0, 0, 0.2);
+    }
+}

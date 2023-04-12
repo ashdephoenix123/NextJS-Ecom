@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
-// import Image from 'next/image'
+import Image from 'next/image'
 import styles from '../styles/Home.module.scss'
 
 
 export default function Home() {
   return (
     <>
-      <img src='/homeImage2.png' alt='hero' className={styles.homeImage1}/>
+      <Image src='/homeImage2.png' alt='hero' className={styles.homeImage1}/>
       <main className='container' >
         <h3>Yo Man!</h3>
         <p>

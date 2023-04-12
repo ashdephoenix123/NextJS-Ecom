@@ -30,12 +30,11 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
 
                     <div className={styles.navigation__nav}>
                         <ul className={styles.navigation__list}>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>Men</a></li>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>Women</a></li>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>Kids</a></li>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>Home & Living</a></li>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>Beauty</a></li>
-                            <li className={styles.navigation__item}><a href="#" className={styles.navigation__link}>More</a></li>
+                            <li className={styles.navigation__item}><Link href="/tshirts" className={styles.navigation__link}>Tshirts</Link></li>
+                            <li className={styles.navigation__item}><Link href="/hoodies" className={styles.navigation__link}>Hoodies</Link></li>
+                            <li className={styles.navigation__item}><Link href="/mugs" className={styles.navigation__link}>Mugs</Link></li>
+                            <li className={styles.navigation__item}><Link href="/stickers" className={styles.navigation__link}>Stickers</Link></li>
+                            <li className={styles.navigation__item}><Link href="#" className={styles.navigation__link}>More</Link></li>
                         </ul>
                     </div>
                 </div>

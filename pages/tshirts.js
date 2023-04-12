@@ -14,6 +14,7 @@ const tshirts = ({ products }) => {
                         filters
                     </div>
                     <div className={styles.allCards}>
+                        {Object.keys(products).length === 0 && <p className='flex justify-center items-center italic'>No T-Shirts to display Or they are currently Out of Stock. Please try again later.</p>}
                         {Object.keys(products).map((item) => {
                             return <Link key={products[item]._id} href={`/products/${products[item].productId}`}>
                                 <div className={styles.card}>

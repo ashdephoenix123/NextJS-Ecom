@@ -18,11 +18,11 @@ const Footer = () => {
                     <div className={styles.footer__links1}>
                         <h3>Shop</h3>
                         <ul className={styles.footer__links1}>
-                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/products/tshirts">T-Shirts</Link></li>
-                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/products/sweatshirts">Sweatshirts</Link></li>
-                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/products/hoodies">Hoodies</Link></li>
-                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/products/zipperhoodies">Zipper Hoodies</Link></li>
-                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/products/mugs">Mugs</Link></li>
+                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/tshirts">T-Shirts</Link></li>
+                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/sweatshirts">Sweatshirts</Link></li>
+                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/hoodies">Hoodies</Link></li>
+                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/stickers">Stickers</Link></li>
+                            <li className={`${styles.footer__linksLists} ${styles.adjusting}`}><Link href="/mugs">Mugs</Link></li>
                         </ul>
                     </div>
                     <div className={styles.footer__links1}>
@@ -38,6 +38,7 @@ const Footer = () => {
                         <ul className={styles.footer__links1}>
                             <li className={styles.footer__linksLists}><Link href="/privacypolicy">Privacy Policy</Link></li>
                             <li className={styles.footer__linksLists}><Link href="/terms">Terms & Conditions</Link></li>
+                            <li className={styles.footer__linksLists}><Link href="/sources">Sources</Link></li>
                         </ul>
                     </div>
                     <div className={styles.footer__links1}>

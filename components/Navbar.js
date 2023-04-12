@@ -5,7 +5,7 @@ import { IoMdArrowDropup } from 'react-icons/io'
 import { AiOutlineShoppingCart } from 'react-icons/ai'
 import { HiPlusCircle, HiMinusCircle } from 'react-icons/hi'
 import { BsFillBagFill } from 'react-icons/bs'
-import { MdDelete } from 'react-icons/md'
+import { MdDelete, MdAccountCircle } from 'react-icons/md'
 
 const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
     const cartCheckboxRef = useRef();
@@ -61,16 +61,21 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                         </div>
                     </li>
 
-                    <li className={`${styles.list__item} ${styles.dropdown}`}>
-                        <Link className={styles.list__itemLink} href="/login">LogIn<IoMdArrowDropup className={styles.upIcon} size={15} /></Link>
-                        <div className={`${styles.list__item} ${styles.dropdownContent}`} >
-                            <span>New User?</span>
-                            <Link className={styles.list__itemLink2} href='/signup'>SignUp</Link>
-                        </div>
-                    </li>
                     <li className={styles.list__item}>
                         <div className={styles.list__itemLink}>
                             <img width={100} height={100} className={styles.darkMode} src="/darkMode.png" alt="" />
+                        </div>
+                    </li>
+                    <li className={`${styles.list__item} ${styles.dropdown}`}>
+                        <Link className={styles.list__itemLink} href="/login"><MdAccountCircle size={25} /><IoMdArrowDropup className={styles.upIcon} size={15} /></Link>
+                        <div className={`${styles.list__item} ${styles.dropdownContent}`} >
+                            <Link className={`${styles.list__itemLink2} w-full mb-2 text-center`} href='/login'>LogIn</Link>
+                            <div className="relative flex items-center w-full">
+                                <div className="flex-grow border-t border-gray-400"></div>
+                                <span className="flex-shrink mx-4 text-gray-400">Or</span>
+                                <div className="flex-grow border-t border-gray-400"></div>
+                            </div>
+                            <Link className={`${styles.list__itemLink2} w-full text-center`} href='/signup'>SignUp</Link>
                         </div>
                     </li>
                 </ul>
@@ -89,18 +94,21 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                                 {Object.keys(cart).length === 0 && <li className='text-2xl mx-auto'>Uh oh! Your Cart is Empty!</li>}
                                 {Object.keys(cart).map((item, index) => {
                                     return <li key={item}>
-                                        {index + 1 + '. ' + cart[item].name}
+                                        {index + 1 + '. ' + cart[item].name + " - (" + cart[item].size + " / " + cart[item].variant  + ")" + " - ₹" +cart[item].price}
                                         <div>
-                                            <HiMinusCircle onClick={()=> {updateCartItem(item, cart[item].quantity, cart[item].price, cart[item].name, cart[item].size, cart[item].variant)}} size={20} />
+                                            <HiMinusCircle onClick={() => { updateCartItem(item, cart[item].quantity, cart[item].price, cart[item].name, cart[item].size, cart[item].variant) }} size={20} />
                                             <span>{cart[item].quantity}</span>
-                                            <HiPlusCircle onClick={()=> {addToCart(item, cart[item].quantity, cart[item].price, cart[item].name, cart[item].size, cart[item].variant)}} size={20} /> 
-                                            <MdDelete  onClick={()=> {removeItem(item)}} size={20} />
+                                            <HiPlusCircle onClick={() => { addToCart(item, cart[item].quantity, cart[item].price, cart[item].name, cart[item].size, cart[item].variant) }} size={20} />
+                                            <MdDelete onClick={() => { removeItem(item) }} size={20} />
                                         </div>
                                     </li>
                                 }
                                 )}
                             </ol>
-                            <Link onClick={unCheck} href={`/checkout`}><button className={`${styles.btn} mb-1`}><BsFillBagFill size={20}/>Checkout</button></Link>
+                            <div className='py-2 px-8 my-5'>
+                                {subtotal !==0 && <div>SubTotal - ₹{subtotal}</div>}
+                            </div>
+                            <Link onClick={unCheck} href={`/checkout`}><button className={`${styles.btn} mb-1`}><BsFillBagFill size={20} />Checkout</button></Link>
                             <button className={styles.btn} onClick={clearCart}>Clear Cart</button>
                         </div>
                     </div>

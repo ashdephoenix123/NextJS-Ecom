@@ -14,20 +14,22 @@ export default function App({ Component, pageProps }) {
     try {
       const savedCart = JSON.parse(localStorage.getItem('cart'));
       if (savedCart) {
-        setCart(savedCart);
+        setCart(savedCart); 
+        saveCart(savedCart)
       }
     } catch (error) {
       console.error(error);
       localStorage.clear()
     }
   }, [])
+
   const saveCart = (myCart) => {
     let subt = 0;
     localStorage.setItem('cart', JSON.stringify(myCart));
     for (let key in myCart) {
       subt += myCart[key].price * myCart[key].quantity;
     }
-    setSubtotal(subtotal);
+    setSubtotal(subt);
   }
 
   const addToCart = (itemcode, quantity, price, name, size, variant) => {
@@ -37,6 +39,14 @@ export default function App({ Component, pageProps }) {
     } else {
       newCart[itemcode] = { quantity, price, name, size, variant };
     }
+    setCart(newCart);
+    saveCart(newCart);
+  }
+
+  const buyNow = (itemcode, quantity, price, name, size, variant) => {
+    saveCart({});
+    let newCart = {};
+    newCart[itemcode] = { quantity, price, name, size, variant };
     setCart(newCart);
     saveCart(newCart);
   }
@@ -53,7 +63,7 @@ export default function App({ Component, pageProps }) {
     saveCart(newCart);
   }
 
-  const removeItem = (itemcode)=> {
+  const removeItem = (itemcode) => {
     let newCart = { ...cart };
     delete newCart[itemcode];
     setCart(newCart);
@@ -74,7 +84,7 @@ export default function App({ Component, pageProps }) {
     </Head>
     <Navbar cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} />
     <TopMargin />
-    <Component cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />
+    <Component cart={cart} buyNow={buyNow} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />
     <Footer />
   </>
 }

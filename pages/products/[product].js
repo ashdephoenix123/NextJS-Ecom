@@ -1,12 +1,19 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { BsFillBagFill } from 'react-icons/bs'
+import connectDB from "@/middleware/conn";
+import ProductModel from '@/models/Product'
+import styles from '@/styles/product.module.scss'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Product = ({addToCart}) => {
+const Product = ({ addToCart, buyNow, findProduct, variants }) => {
     const router = useRouter();
     const { product } = router.query;
     const [pincode, setPincode] = useState('');
     const [message, setMessage] = useState('');
+    const [color, setColor] = useState(findProduct.color);
+    const [size, setSize] = useState(findProduct.size);
 
     const updatePincode = (e) => {
         const { value } = e.target;
@@ -14,24 +21,74 @@ const Product = ({addToCart}) => {
     }
 
     const checkService = async () => {
-        if (!pincode || pincode.length < 6) return setMessage('Please enter a valid pincode.');
+        if (!pincode || pincode.length < 6) {
+            setMessage('Please enter a valid pincode.');
+            return toast.error('Please enter a valid pincode.', {
+                position: "bottom-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
         const response = await fetch(`/api/pincode`);
         const data = await response.json();
         if (data.includes(parseInt(pincode))) {
             setMessage('Yay! This Pincode is serviceable.')
+            toast.success('Yay! This Pincode is serviceable.', {
+                position: "bottom-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         } else {
             setMessage('Sorry! This Pincode is currently unserviceable.')
+            toast.error('Sorry! This Pincode is currently unserviceable.', {
+                position: "bottom-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         }
     }
+
+    const refreshVariant = (newcolor, newsize) => {
+        const varianturl = `/products/${variants[newcolor][newsize]['productId']}`
+        window.location = varianturl
+    }
+
     return (
         <>
             <section className="text-gray-600 body-font overflow-hidden">
+                <ToastContainer
+                    position="bottom-center"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
                 <div className="container px-5 py-24 mx-auto">
                     <div className="lg:w-4/5 mx-auto flex flex-wrap">
-                        <img alt="ecommerce" className='lg:w-1/2 w-full h-3/4 sm:w-1/2 object-cover object-top rounded' src="https://prod-img.thesouledstore.com/public/theSoul/uploads/catalog/product/1674111434_2747206.jpg?format=webp&w=480&dpr=1.8" />
-                        <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
-                            <h2 className="text-md title-font text-gray-500 tracking-widest">Sharkk Co.</h2>
-                            <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">Boston T-Shirt</h1>
+                        <img alt="ecommerce" className={`lg:w-1/2 w-full h-3/4 sm:w-1/2 object-cover object-top rounded ${styles.fixImage}`} src={findProduct.img} />
+                        <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0 relative">
+                            <h2 className="text-md title-font text-gray-500 tracking-widest">{findProduct.category}</h2>
+                            <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">{findProduct.title} {`(${findProduct.size} / ${findProduct.color.charAt(0).toUpperCase()}${findProduct.color.slice(1)})`}</h1>
                             <div className="flex mb-4">
                                 <span className="flex items-center">
                                     <svg fill="currentColor" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 text-green-500" viewBox="0 0 24 24">
@@ -69,22 +126,27 @@ const Product = ({addToCart}) => {
                                     </a>
                                 </span>
                             </div>
-                            <p className="leading-relaxed">Fam locavore kickstarter distillery. Mixtape chillwave tumeric sriracha taximy chia microdosing tilde DIY. XOXO fam indxgo juiceramps cornhole raw denim forage brooklyn. Everyday carry +1 seitan poutine tumeric. Gastropub blue bottle austin listicle pour-over, neutra jean shorts keytar banjo tattooed umami cardigan.</p>
+                            <p className="leading-relaxed">{findProduct.desc}</p>
                             <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5">
-                                <div className="flex">
+                                <div className="flex items-center">
                                     <span className="mr-3">Color</span>
-                                    <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:outline-none"></button>
-                                    <button className="border-2 border-gray-300 ml-1 bg-gray-700 rounded-full w-6 h-6 focus:outline-none"></button>
-                                    <button className="border-2 border-gray-300 ml-1 bg-green-500 rounded-full w-6 h-6 focus:outline-none"></button>
+                                    {Object.keys(variants).map((individualColor, index) => {
+                                        return Object.keys(variants[individualColor]).includes(size) && <button key={index} onClick={() => { refreshVariant(individualColor, size) }} className={`border-2 ml-1 rounded-full w-6 h-6 focus:outline-none ${individualColor === color ? 'border-black' : "border-gray-300"}`} style={{ backgroundColor: individualColor }}></button>
+                                    })}
+
                                 </div>
+
+
                                 <div className="flex ml-6 items-center">
                                     <span className="mr-3">Size</span>
                                     <div className="relative">
-                                        <select className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500 text-base pl-3 pr-10">
-                                            <option>SM</option>
-                                            <option>M</option>
-                                            <option>L</option>
-                                            <option>XL</option>
+                                        <select value={size} onChange={(e) => { refreshVariant(color, e.target.value) }} className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500 text-xl pl-3 pr-10">
+                                            {Object.keys(variants[color]).includes('S') && <option value={'S'}>S</option>}
+                                            {Object.keys(variants[color]).includes('M') && <option value={'M'}>M</option>}
+                                            {Object.keys(variants[color]).includes('L') && <option value={'L'}>L</option>}
+                                            {Object.keys(variants[color]).includes('XL') && <option value={'XL'}>XL</option>}
+                                            {Object.keys(variants[color]).includes('XXL') && <option value={'XXL'}>XXL</option>}
+
                                         </select>
                                         <span className="absolute right-0 top-0 h-full w-10 text-center text-gray-600 pointer-events-none flex items-center justify-center">
                                             <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4" viewBox="0 0 24 24">
@@ -95,24 +157,50 @@ const Product = ({addToCart}) => {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <span className="title-font font-medium text-2xl text-gray-900">₹499</span>
-                                <button onClick={()=> {addToCart(product, 1, 499, "Boston Hooodie, Premium Wearable Brand", "L", "black")}} className="flex ml-10 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded"> <BsFillBagFill className='mr-3' size={20} /> Add To Cart</button>
-                                <button className="flex ml-5 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded"> Buy Now</button>
+                                <span className="title-font font-medium text-2xl text-gray-900">₹{findProduct.price}</span>
+                                <button onClick={() => {
+                                    addToCart(findProduct.productId, 1, findProduct.price, findProduct.title, findProduct.size, findProduct.color); toast.success('Added to cart!')
+                                }} className="flex ml-10 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded"> <BsFillBagFill className='mr-3' size={20} /> Add To Cart</button>
+                                <button onClick={() => { buyNow(findProduct.productId, 1, findProduct.price, findProduct.title, findProduct.size, findProduct.color); router.push('/checkout') }} className="flex ml-5 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded">Buy Now</button>
+
                             </div>
                             <div className="flex items-center mt-5">
                                 <input type="number" className='p-2 border-2 border-stone-300 rounded-md' placeholder='Enter Pincode' name='pincode' value={pincode} onChange={updatePincode} />
                                 <button className="flex ml-2 text-white bg-green-500 border-0 py-3 px-6 focus:outline-none hover:bg-green-600 rounded" onClick={checkService}> Check</button>
                             </div>
-                            {message === 'Please enter a valid pincode.' && message !== "" && <div className="text-red-600 mt-2 font-semibold">{message}</div>}
+                            {/* {message === 'Please enter a valid pincode.' && message !== "" && <div className="text-red-600 mt-2 font-semibold">{message}</div>}
                             {message === 'Sorry! This Pincode is currently unserviceable.' && message !== "" && <div className="text-red-600 mt-2 font-semibold">{message}</div>}
-                            {message === 'Yay! This Pincode is serviceable.' && message !== "" && <div className="text-green-600 mt-2 font-semibold">{message}</div>}
-                            
+                            {message === 'Yay! This Pincode is serviceable.' && message !== "" && <div className="text-green-600 mt-2 font-semibold">{message}</div>} */}
+
+                            {/* <div className={`p-4 my-4 text-white rounded-lg bg-green-50 dark:bg-gray-600 dark:text-white w-fit checkmark`} role="alert">
+                                <span className="font-medium flex items-center"><img height={30} width={30} src="/checkmark.png" alt="checkmark" className='mr-2' />Added to cart!</span>
+                            </div> */}
                         </div>
+
                     </div>
                 </div>
             </section>
         </>
     )
+}
+
+export async function getServerSideProps(context) {
+    await connectDB();
+    const findProduct = await ProductModel.findOne({ productId: context.query.product });
+    const variants = await ProductModel.find({ title: findProduct.title })
+    const colorsCollection = {};
+    for (let item of variants) {
+        if (colorsCollection[item.color]) {
+            colorsCollection[item.color][item.size] = { productId: item.productId }
+        } else {
+            colorsCollection[item.color] = {};
+            colorsCollection[item.color][item.size] = { productId: item.productId }
+        }
+    }
+
+    return {
+        props: { findProduct: JSON.parse(JSON.stringify(findProduct)), variants: JSON.parse(JSON.stringify(colorsCollection)) }
+    }
 }
 
 export default Product

@@ -10,9 +10,9 @@ const tshirts = ({ products }) => {
             <section className="container">
                 <h2 className={styles.productTitle}>Trending Tshirt Collection</h2>
                 <div className={styles.test}>
-                    <div className={styles.left}>
+                    {/* <div className={styles.left}>
                         filters
-                    </div>
+                    </div> */}
                     <div className={styles.allCards}>
                         {Object.keys(products).length === 0 && <p className='flex justify-center items-center italic'>No T-Shirts to display Or they are currently Out of Stock. Please try again later.</p>}
                         {Object.keys(products).map((item) => {

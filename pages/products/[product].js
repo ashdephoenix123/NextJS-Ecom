@@ -187,7 +187,7 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
 export async function getServerSideProps(context) {
     await connectDB();
     const findProduct = await ProductModel.findOne({ productId: context.query.product });
-    const variants = await ProductModel.find({ title: findProduct.title })
+    const variants = await ProductModel.find({ title: findProduct.title, category: findProduct.category })
     const colorsCollection = {};
     for (let item of variants) {
         if (colorsCollection[item.color]) {

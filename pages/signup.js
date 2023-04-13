@@ -1,34 +1,110 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Signup = () => {
+
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: ""
+  })
+
+  const updateUser = (e) => {
+    const { name, value } = e.target;
+    setUser(prev => {
+      return {
+        ...prev,
+        [name]: value
+      }
+    })
+  }
+
+  const submitUser = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/usersignup', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(user)
+    })
+    const data = await res.json();
+    console.log(data)
+
+    if (data.success) {
+      toast.success("User have been registered successfully!", {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setUser({
+        name: "",
+        email: "",
+        password: ""
+      })
+    } else {
+      toast.error(data.error, {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }
   return (
     <>
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-2">
+        <ToastContainer
+          position="top-left"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <div className="w-full max-w-md space-y-8">
           <div>
             <img className="mx-auto h-12 w-auto" src="/fav.png" alt="Your Company" />
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Create a new account</h2>
-
           </div>
-          <htmlForm className="mt-8 space-y-6" action="#" method="POST">
+          <form className="mt-8 space-y-6" method="POST" onSubmit={submitUser}>
             <input type="hidden" name="remember" value="true" />
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
                 <label htmlFor="name" className="sr-only">Name</label>
-                <input id="name" name="name" type="email" autoComplete="email" required className="focus:outline-none relative block w-full rounded-t-md border-0 py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Name" />
+                <input id="name" name="name" value={user.name} onChange={updateUser} type="text" className="focus:outline-none relative block w-full rounded-t-md border-0 py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Name" required />
               </div>
               <div>
-                <label htmlFor="email-address" className="sr-only">Email address</label>
-                <input id="email-address" name="email" type="email" autoComplete="email" required className="focus:outline-none relative block w-full  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Email address" />
+                <label htmlFor="email" className="sr-only">Email address</label>
+                <input id="email" name="email" value={user.email} onChange={updateUser} type='email' className="focus:outline-none relative block w-full  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Email address" required />
               </div>
               <div>
                 <label htmlFor="password" className="sr-only">Password</label>
-                <input id="password" name="password" type="password" autoComplete="current-password" required className="focus:outline-none relative block w-full  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Password" />
+                <input id="password" name="password" value={user.password} onChange={updateUser} type="password" className="focus:outline-none relative block w-full rounded-b-md  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Password" required />
               </div>
-              <div>
+              {/* <div>
+                <label htmlFor="password" className="sr-only">Password</label>
+                <input id="password" name="password" type="password" autoComplete="current-password" required className="focus:outline-none relative block w-full  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Password" />
+              </div> */}
+              {/* <div>
                 <label htmlFor="cpassword" className="sr-only">Password</label>
                 <input id="cpassword" name="cpassword" type="password" autoComplete="current-password" required className="focus:outline-none relative block w-full rounded-b-md border-0 py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Confirm Password" />
-              </div>
+              </div> */}
             </div>
 
             <div>
@@ -45,7 +121,7 @@ const Signup = () => {
               <div className="mx-2 block text-md text-gray-900">Already have an account?</div>
               <Link href="/login" className='font-medium text-green-600 hover:text-green-500'>Log In</Link>
             </div>
-          </htmlForm>
+          </form>
         </div>
       </div>
     </>

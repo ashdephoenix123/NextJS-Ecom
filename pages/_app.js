@@ -4,24 +4,31 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import TopMargin from '@/components/TopMargin'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 export default function App({ Component, pageProps }) {
-
+  const router = useRouter();
   const [cart, setCart] = useState({});
   const [subtotal, setSubtotal] = useState(0);
+  const [usertoken, setUsertoken] = useState({value: null})
 
   useEffect(() => {
     try {
       const savedCart = JSON.parse(localStorage.getItem('cart'));
       if (savedCart) {
-        setCart(savedCart); 
+        setCart(savedCart);
         saveCart(savedCart)
       }
+      const token = localStorage.getItem('usertoken');
+      if (token) {
+        setUsertoken({value: token})
+      }
+
     } catch (error) {
       console.error(error);
       localStorage.clear()
     }
-  }, [])
+  }, [router.query])
 
   const saveCart = (myCart) => {
     let subt = 0;
@@ -74,6 +81,11 @@ export default function App({ Component, pageProps }) {
     setCart({});
     saveCart({});
   }
+  const logout = () => {
+    localStorage.removeItem('usertoken')
+    setUsertoken({value: null});
+    router.push('/login')
+  }
 
   return <>
     <Head>
@@ -82,7 +94,7 @@ export default function App({ Component, pageProps }) {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" href="/fav.png" />
     </Head>
-    <Navbar cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} />
+    <Navbar logout={logout} usertoken={usertoken} cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} />
     <TopMargin />
     <Component cart={cart} buyNow={buyNow} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />
     <Footer />

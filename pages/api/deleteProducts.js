@@ -5,15 +5,15 @@ export default async function handler(req, res) {
     try {
         if (req.method === "POST") {
             await connectDB();
-            if(req.body.length === 0) throw new error("No products to delete");
+            if(req.body.length === 0) throw new Error("No products to delete");
             for (let i in req.body) {
                await Product.findByIdAndDelete(req.body[i]._id)
             }
             res.status(200).json({ success: "success" })
         } else {
-            throw new error( "Request method not allowed")
+            throw new Error( "Request method not allowed")
         }
     } catch (error) {
-        res.status(200).json({ error: error.message })
+        res.status(400).json({ error: error.message })
     }
 }

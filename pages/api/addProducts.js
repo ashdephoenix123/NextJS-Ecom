@@ -5,6 +5,7 @@ export default async function handler(req, res) {
     try {
         if (req.method === "POST") {
             await connectDB();
+            if(req.body.length === 0) throw new Error("Cannot leave the product details blank.");
             for (let i in req.body) {
                 const product = new Product({
                     productId: req.body[i].productId,
@@ -21,9 +22,9 @@ export default async function handler(req, res) {
             }
             res.status(200).json({ success: "success" })
         } else {
-            throw new error( "Request method not allowed")
+            throw new Error( "Request method not allowed")
         }
     } catch (error) {
-        res.status(200).json({ error: error.message })
+        res.status(400).json({ error: error.message })
     }
 }

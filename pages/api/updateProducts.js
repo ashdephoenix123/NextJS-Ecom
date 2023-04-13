@@ -5,15 +5,15 @@ export default async function handler(req, res) {
     try {
         if (req.method === "POST") {
             await connectDB();          
-            if(req.body.length === 0) throw new error("No products to update");
+            if(req.body.length === 0) throw new Error("No products to update");
             for (let i in req.body) {
                await Product.findByIdAndUpdate(req.body[i]._id, req.body[i])
             }
             res.status(200).json({ success: "success" })
         } else {
-            throw new error( "Request method not allowed")
+            throw new Error( "Request method not allowed")
         }
     } catch (error) {
-        res.status(200).json({ error: error.message })
+        res.status(400).json({ error: error.message })
     }
 }

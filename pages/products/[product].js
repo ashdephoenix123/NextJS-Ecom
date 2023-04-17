@@ -34,7 +34,7 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
                 theme: "light",
             });
         }
-        const response = await fetch(`/api/pincode`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
         const data = await response.json();
         if (data.includes(parseInt(pincode))) {
             setMessage('Yay! This Pincode is serviceable.')

@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styles from '../styles/tshirts.module.scss'
 import Link from 'next/link'
 import connectDB from "@/middleware/conn";
 import Product from '../models/Product'
 
 const Hoodies = ({ products }) => {
+   
     return (
         <>
             <section className="container">

@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/router';
 
 const Signup = () => {
+
+  const router = useRouter();
 
   const [user, setUser] = useState({
     name: "",
@@ -23,7 +27,7 @@ const Signup = () => {
 
   const submitUser = async (e) => {
     e.preventDefault();
-    const res = await fetch('/api/usersignup', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/usersignup`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -62,6 +66,13 @@ const Signup = () => {
       });
     }
   }
+
+  useEffect(()=> {
+    if(localStorage.getItem('usertoken')){
+      router.push('/')
+    }
+  }, [])
+
   return (
     <>
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-2">

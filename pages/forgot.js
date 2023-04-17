@@ -1,6 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Link from 'next/link'
 const Forgot = () => {
+  const router = useRouter()
+  useEffect(() => {
+    if (localStorage.getItem('usertoken')) {
+      router.push('/')
+    }
+  }, [])
   return (
     <>
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-16">
@@ -21,7 +28,7 @@ const Forgot = () => {
 
             <div>
               <button type="submit" className="group relative flex w-full justify-center rounded-md bg-green-600 py-4 px-2  text-md font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
-               Continue
+                Continue
               </button>
             </div>
             <div className="relative flex items-center w-full">
@@ -31,7 +38,7 @@ const Forgot = () => {
             </div>
             <div className="flex items-center justify-center">
               <div className="mx-2 block text-md text-gray-900"> Go back to</div>
-              <Link href="/login" className='font-medium text-green-600 hover:text-green-500'>Log In</Link> 
+              <Link href="/login" className='font-medium text-green-600 hover:text-green-500'>Log In</Link>
               <div className="mx-2 block text-md text-gray-900">page</div>
             </div>
           </form>

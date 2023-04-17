@@ -1,10 +1,87 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { HiPlusCircle, HiMinusCircle } from 'react-icons/hi'
 import { MdDelete } from 'react-icons/md'
+import Head from 'next/head'
+import Script from 'next/script'
 
-const checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
+const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
+    const [address, setAddress] = useState({
+        name: "",
+        email: "",
+        address: "",
+        phone: "",
+        pincode: "",
+        state: "",
+        district: ""
+    });
+    const [disabled, setDisabled] = useState(true)
+
+    const updateAddress = (e) => {
+        const { name, value } = e.target;
+        setAddress(prev => {
+            return {
+                ...prev,
+                [name]: value
+            }
+        })
+    }
+    useEffect(() => {
+        if (address.name.length !== 0 && address.email.length !== 0 && address.address.length !== 0 && address.phone.length === 10 && address.pincode.length === 6 && address.state.length !== 0 && address.district.length !== 0) {
+            setDisabled(false)
+        } else {
+            setDisabled(true)
+        }
+    }, [address.name, address.email, address.address, address.phone, address.pincode, address.state, address.district])
+
+    let orderID;
+    const initiatePayment = async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/createorder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify({ subtotal, email: address.email, address: address.address, cart })
+        })
+        const data = await res.json();
+        if (data.status === 'created') {
+            orderID = data.id;
+            var options = {
+                "key_id": process.env.RAZORPAY_KEYID, // Enter the Key ID generated from the Dashboard
+                "amount": subtotal * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Sharkk & Co.",
+                "description": "Test Transaction",
+                "image": "/1.png",
+                "order_id": orderID, 
+                "callback_url": `${process.env.NEXT_PUBLIC_HOST}/api/callbackurl`,
+                "prefill": {
+                    "name": address.name,
+                    "email": address.email,
+                    "contact": address.phone
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#00790F"
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+
+        } else {
+            console.log("Something went wrong.")
+        }
+    }
     return (
         <>
+            <Head>
+                <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0" />
+            </Head>
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+
+            {/* <Script type="application/javascript" src={`${process.env.NEXT_PUBLIC_PAYTM_STAGING_HOST}/merchantpgpui/checkoutjs/merchants/${process.env.NEXT_PUBLIC_PAYTM_MID}.js`}  crossorigin="anonymous" /> */}
             <div className="container">
                 <section className="text-gray-600 ">
                     <div className="container px-5 py-24 mx-auto">
@@ -17,43 +94,43 @@ const checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="name" className="leading-7 text-md text-gray-600">Name</label>
-                                        <input type="text" id="name" name="name" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="text" id="name" name="name" value={address.name} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="email" className="leading-7 text-md text-gray-600">Email</label>
-                                        <input type="email" id="email" name="email" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="email" id="email" name="email" value={address.email} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-full">
                                     <div className="">
-                                        <label htmlFor="message" className="leading-7 text-md text-gray-600">Address</label>
-                                        <textarea id="message" name="message" rows={3} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                                        <label htmlFor="address" className="leading-7 text-md text-gray-600">Address</label>
+                                        <textarea id="address" name="address" value={address.address} onChange={updateAddress} rows={3} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="phone" className="leading-7 text-md text-gray-600">Phone</label>
-                                        <input type="number" id="phone" name="phone" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="number" id="phone" name="phone" value={address.phone} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
-                                        <label htmlFor="pincode" className="leading-7 text-md text-gray-600">Pincode (India)</label>
-                                        <input type="number" id="pincode" name="pincode" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <label htmlFor="pincode" className="leading-7 text-md text-gray-600">Pincode</label>
+                                        <input type="number" id="pincode" name="pincode" value={address.pincode} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="state" className="leading-7 text-md text-gray-600">State</label>
-                                        <input type="text" id="state" name="state" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="text" id="state" name="state" value={address.state} onChange={updateAddress} readOnly={false} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="district" className="leading-7 text-md text-gray-600">District</label>
-                                        <input type="text" id="district" name="district" className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="text" id="district" name="district" value={address.district} onChange={updateAddress} readOnly={false} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
 
@@ -80,7 +157,7 @@ const checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                                         <div className='mt-4'>Total: ₹{subtotal}</div>
                                     </ol>
                                 </div>
-                            <button className='mt-6 px-6 py-4 text-white bg-green-500 rounded hover:bg-green-600'>Pay ₹{subtotal} </button>
+                                <button disabled={disabled} onClick={initiatePayment} className='disabled:bg-green-300 mt-6 px-6 py-4 text-white bg-green-500 rounded hover:bg-green-600'>Pay ₹{subtotal} </button>
                             </div>
                         </div>
 
@@ -91,4 +168,4 @@ const checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
     )
 }
 
-export default checkout
+export default Checkout

@@ -53,10 +53,10 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                     <li className={`${styles.list__item} ${styles.dropdown}`}>
                         <div className={styles.list__itemLink}>All Products<IoMdArrowDropup className={styles.upIcon} size={15} /></div>
                         <div className={`${styles.list__item} ${styles.dropdownContent}`} >
-                            <Link className={styles.list__itemLink3} href='/tshirts'>T-Shirts</Link>
-                            <Link className={styles.list__itemLink3} href='/hoodies'>Hoodies</Link>
-                            <Link className={styles.list__itemLink3} href='/mugs'>Mugs</Link>
-                            <Link className={styles.list__itemLink3} href='/stickers'>Stickers</Link>
+                            <Link  className={styles.list__itemLink3} href='/tshirts'>T-Shirts</Link>
+                            <Link  className={styles.list__itemLink3} href='/hoodies'>Hoodies</Link>
+                            <Link  className={styles.list__itemLink3} href='/mugs'>Mugs</Link>
+                            <Link  className={styles.list__itemLink3} href='/stickers'>Stickers</Link>
                         </div>
                     </li>
 
@@ -77,7 +77,7 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                     {!usertoken.value &&
                         <li className={`${styles.list__item} ${styles.dropdown}`}>
                             <Link href="/login">
-                                <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded">
+                                <button className="bg-green-600 hover:bg-green-700 text-white py-3 px-5 rounded-xl">
                                     Log In
                                 </button>
                             </Link>

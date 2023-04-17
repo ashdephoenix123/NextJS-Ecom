@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,7 +22,7 @@ const Login = () => {
   }
   const submitUser = async (e) => {
     e.preventDefault();
-    const res = await fetch('/api/userlogin', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/userlogin`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -35,7 +35,7 @@ const Login = () => {
       localStorage.setItem('usertoken', data.token)
       toast.success("User logged In successfully!", {
         position: "top-left",
-        autoClose: 3000,
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -65,6 +65,11 @@ const Login = () => {
     }
   }
 
+  useEffect(()=> {
+    if(localStorage.getItem('usertoken')){
+      router.push('/')
+    }
+  }, [])
   return (
     <>
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-2">

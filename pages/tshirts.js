@@ -4,7 +4,7 @@ import Link from 'next/link'
 import connectDB from "@/middleware/conn";
 import Product from '../models/Product'
 
-const tshirts = ({ products }) => {
+const tshirts = ({ products}) => {
     return (
         <>
             <section className="container">

@@ -5,14 +5,24 @@ import Footer from '@/components/Footer'
 import TopMargin from '@/components/TopMargin'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import LoadingBar from 'react-top-loading-bar'
+
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [cart, setCart] = useState({});
   const [subtotal, setSubtotal] = useState(0);
-  const [usertoken, setUsertoken] = useState({value: null})
+  const [usertoken, setUsertoken] = useState({ value: null })
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
+    router.events.on('routeChangeStart', ()=> {
+      setProgress(20)
+    })
+    router.events.on('routeChangeComplete', ()=> {
+      setProgress(100)
+    })
+    
     try {
       const savedCart = JSON.parse(localStorage.getItem('cart'));
       if (savedCart) {
@@ -21,7 +31,7 @@ export default function App({ Component, pageProps }) {
       }
       const token = localStorage.getItem('usertoken');
       if (token) {
-        setUsertoken({value: token})
+        setUsertoken({ value: token })
       }
 
     } catch (error) {
@@ -83,7 +93,7 @@ export default function App({ Component, pageProps }) {
   }
   const logout = () => {
     localStorage.removeItem('usertoken')
-    setUsertoken({value: null});
+    setUsertoken({ value: null });
     router.push('/login')
   }
 
@@ -94,6 +104,11 @@ export default function App({ Component, pageProps }) {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" href="/fav.png" />
     </Head>
+    <LoadingBar
+      color='#2f8e07'
+      progress={progress}
+      onLoaderFinished={() => setProgress(0)}
+    />
     <Navbar logout={logout} usertoken={usertoken} cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} />
     <TopMargin />
     <Component cart={cart} buyNow={buyNow} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />

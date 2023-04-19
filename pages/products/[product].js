@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { BsFillBagFill } from 'react-icons/bs'
 import connectDB from "@/middleware/conn";
@@ -6,14 +6,22 @@ import ProductModel from '@/models/Product'
 import styles from '@/styles/product.module.scss'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Error from 'next/error';
 
-const Product = ({ addToCart, buyNow, findProduct, variants }) => {
+const Product = ({ addToCart, buyNow, findProduct, variants, error }) => {
     const router = useRouter();
     const { product } = router.query;
     const [pincode, setPincode] = useState('');
     const [message, setMessage] = useState('');
-    const [color, setColor] = useState(findProduct.color);
-    const [size, setSize] = useState(findProduct.size);
+    const [color, setColor] = useState("");
+    const [size, setSize] = useState("");
+
+    useEffect(() => {
+        if (!error) {
+            setColor(findProduct.color)
+            setSize(findProduct.size)
+        }
+    }, [router.query])
 
     const updatePincode = (e) => {
         const { value } = e.target;
@@ -36,7 +44,8 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
         }
         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
         const data = await response.json();
-        if (data.includes(parseInt(pincode))) {
+
+        if (Object.keys(data).includes(pincode)) {
             setMessage('Yay! This Pincode is serviceable.')
             toast.success('Yay! This Pincode is serviceable.', {
                 position: "bottom-center",
@@ -65,7 +74,12 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
 
     const refreshVariant = (newcolor, newsize) => {
         const varianturl = `/products/${variants[newcolor][newsize]['productId']}`
-        window.location = varianturl
+        // window.location = varianturl
+        router.push(varianturl)
+    }
+
+    if (error) {
+        return <Error statusCode={error} />
     }
 
     return (
@@ -141,11 +155,11 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
                                     <span className="mr-3">Size</span>
                                     <div className="relative">
                                         <select value={size} onChange={(e) => { refreshVariant(color, e.target.value) }} className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500 text-xl pl-3 pr-10">
-                                            {Object.keys(variants[color]).includes('S') && <option value={'S'}>S</option>}
-                                            {Object.keys(variants[color]).includes('M') && <option value={'M'}>M</option>}
-                                            {Object.keys(variants[color]).includes('L') && <option value={'L'}>L</option>}
-                                            {Object.keys(variants[color]).includes('XL') && <option value={'XL'}>XL</option>}
-                                            {Object.keys(variants[color]).includes('XXL') && <option value={'XXL'}>XXL</option>}
+                                            {color && Object.keys(variants[color]).includes('S') && <option value={'S'}>S</option>}
+                                            {color && Object.keys(variants[color]).includes('M') && <option value={'M'}>M</option>}
+                                            {color && Object.keys(variants[color]).includes('L') && <option value={'L'}>L</option>}
+                                            {color && Object.keys(variants[color]).includes('XL') && <option value={'XL'}>XL</option>}
+                                            {color && Object.keys(variants[color]).includes('XXL') && <option value={'XXL'}>XXL</option>}
 
                                         </select>
                                         <span className="absolute right-0 top-0 h-full w-10 text-center text-gray-600 pointer-events-none flex items-center justify-center">
@@ -157,11 +171,11 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <span className="title-font font-medium text-2xl text-gray-900">₹{findProduct.price}</span>
+                                <span className="title-font font-medium text-2xl text-gray-900">{findProduct.availableQty !== 0 ? '₹' + findProduct.price : <span className='text-red-700 font-semibold'>Out of Stock</span>}</span>
                                 <button onClick={() => {
                                     addToCart(findProduct.productId, 1, findProduct.price, findProduct.title, findProduct.size, findProduct.color); toast.success('Added to cart!')
-                                }} className="flex ml-10 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded"> <BsFillBagFill className='mr-3' size={20} /> Add To Cart</button>
-                                <button onClick={() => { buyNow(findProduct.productId, 1, findProduct.price, findProduct.title, findProduct.size, findProduct.color); router.push('/checkout') }} className="flex ml-5 text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded">Buy Now</button>
+                                }} disabled={findProduct.availableQty === 0} className="disabled:bg-green-300 flex ml-10 text-white bg-green-500 border-0 py-2 px-6 hover:bg-green-600 focus:outline-none rounded"> <BsFillBagFill className='mr-3' size={20} /> Add To Cart</button>
+                                <button disabled={findProduct.availableQty === 0} onClick={() => { buyNow(findProduct.productId, 1, findProduct.price, findProduct.title, findProduct.size, findProduct.color); router.push('/checkout') }} className="flex ml-5 text-white bg-green-500 border-0 py-2 px-6 hover:bg-green-600 disabled:bg-green-300 focus:outline-none rounded">Buy Now</button>
 
                             </div>
                             <div className="flex items-center mt-5">
@@ -185,9 +199,16 @@ const Product = ({ addToCart, buyNow, findProduct, variants }) => {
 }
 
 export async function getServerSideProps(context) {
+    let error = null;
     await connectDB();
     const findProduct = await ProductModel.findOne({ productId: context.query.product });
+    if (!findProduct) {
+        return {
+            props: { error: 404 }
+        }
+    }
     const variants = await ProductModel.find({ title: findProduct.title, category: findProduct.category })
+    console.log(variants)
     const colorsCollection = {};
     for (let item of variants) {
         if (colorsCollection[item.color]) {
@@ -199,7 +220,7 @@ export async function getServerSideProps(context) {
     }
 
     return {
-        props: { findProduct: JSON.parse(JSON.stringify(findProduct)), variants: JSON.parse(JSON.stringify(colorsCollection)) }
+        props: { error: error, findProduct: JSON.parse(JSON.stringify(findProduct)), variants: JSON.parse(JSON.stringify(colorsCollection)) }
     }
 }
 

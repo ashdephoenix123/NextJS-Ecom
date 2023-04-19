@@ -1,14 +1,27 @@
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
-// import connectDB from "@/middleware/conn";
-// import Order from '@/models/Order'
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const Orders = () => {
     const router = useRouter();
+    const [orders, setOrders] = useState([])
 
     useEffect(() => {
+        const fetchOrders = async () => {
+            const res = await fetch(`/api/fetchOrders`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token: localStorage.getItem('usertoken') })
+            });
+            const data = await res.json();
+            setOrders(data)
+        }
         if (!localStorage.getItem('usertoken')) {
             router.push('/')
+        } else {
+            fetchOrders()
         }
     }, [])
     return (
@@ -23,33 +36,23 @@ const Orders = () => {
                                     <thead className="border-b font-medium dark:border-neutral-500">
                                         <tr>
                                             <th scope="col" className="px-6 py-4">#Order ID</th>
-                                            <th scope="col" className="px-6 py-4">First</th>
-                                            <th scope="col" className="px-6 py-4">Last</th>
-                                            <th scope="col" className="px-6 py-4">Handle</th>
+                                            <th scope="col" className="px-6 py-4">Item Name</th>
+                                            <th scope="col" className="px-6 py-4">Status</th>
+                                            <th scope="col" className="px-6 py-4">More Details</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            className="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-zinc-200">
-                                            <td className="whitespace-nowrap px-6 py-6 font-medium">1</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Mark</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Otto</td>
-                                            <td className="whitespace-nowrap px-6 py-6">@mdo</td>
-                                        </tr>
-                                        <tr
-                                            className="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-zinc-200">
-                                            <td className="whitespace-nowrap px-6 py-6 font-medium">2</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Jacob</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Thornton</td>
-                                            <td className="whitespace-nowrap px-6 py-6">@fat</td>
-                                        </tr>
-                                        <tr
-                                            className="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-zinc-200">
-                                            <td className="whitespace-nowrap px-6 py-6 font-medium">3</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Larry</td>
-                                            <td className="whitespace-nowrap px-6 py-6">Wild</td>
-                                            <td className="whitespace-nowrap px-6 py-6">@twitter</td>
-                                        </tr>
+                                        {orders.length !== 0 &&
+                                            orders.map((order, index) => {
+                                                return <tr key={index}
+                                                    className="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-zinc-200">
+                                                    <td className="whitespace-nowrap px-6 py-6 font-medium">{order.orderID}</td>
+                                                    <td className="whitespace-nowrap px-6 py-6">{Object.keys(order.products)[0]} {Object.keys(order.products).length-1 !==0 && `and ${Object.keys(order.products).length-1} more`}</td>
+                                                    <td className="whitespace-nowrap px-6 py-6 font-semibold text-slate-600">{order.status}</td>
+                                                    <td className="whitespace-nowrap px-6 py-6"><Link href={`/order?id=${order.orderID}`} className='hover:underline'>here</Link></td>
+                                                </tr>
+                                            })
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -60,15 +63,5 @@ const Orders = () => {
         </>
     )
 }
-
-// export async function getServerSideProps(context) {
-//     await connectDB();
-//     const orders = await Order.find({ userId: user.id });
-   
-
-//     return {
-//         props: {orders: orders}
-//     }
-// }
 
 export default Orders

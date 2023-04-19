@@ -5,7 +5,7 @@ import connectDB from "@/middleware/conn";
 import Product from '../models/Product'
 
 const Hoodies = ({ products }) => {
-   
+
     return (
         <>
             <section className="container">
@@ -25,8 +25,9 @@ const Hoodies = ({ products }) => {
                                     <div className={styles.cardContent}>
                                         <h3>{products[item].category}</h3>
                                         <h2>{products[item].title}</h2>
-                                        <div className={styles.price}>₹{products[item].price}</div>
+                                        <div className={styles.price}>{products[item].availableQty !== 0 ? '₹' + products[item].price : <span className='text-red-700 font-semibold'>Out of Stock</span>}</div>
 
+                                    
                                         {products[item]["size"].includes('S') && <div className={styles.size}>S</div>}
                                         {products[item]["size"].includes('M') && <div className={styles.size}>M</div>}
                                         {products[item]["size"].includes('L') && <div className={styles.size}>L</div>}
@@ -65,6 +66,9 @@ export async function getServerSideProps(context) {
             if (item.availableQty > 0) {
                 hoodies[item.title].color = [item.color];
                 hoodies[item.title].size = [item.size];
+            } else {
+                hoodies[item.title].color = [];
+                hoodies[item.title].size = [];
             }
         }
     }

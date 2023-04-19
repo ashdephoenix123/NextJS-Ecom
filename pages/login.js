@@ -92,7 +92,7 @@ const Login = () => {
 
           </div>
           <form className="mt-8 space-y-6" onSubmit={submitUser} method="POST">
-            <input type="hidden" name="remember" value="true" />
+            {/* <input type="hidden" name="remember" value="true" /> */}
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
                 <label htmlFor="email" className="sr-only">Email address</label>
@@ -104,14 +104,14 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            <div className="flex items-center justify-end">
+              {/* <div className="flex items-center">
                 <input id="remember-me" name="remember-me" type="checkbox" className=" h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600" />
                 <label htmlFor="remember-me" className="ml-2 block text-md text-gray-900">Remember me</label>
-              </div>
+              </div> */}
 
               <div className="text-md">
-                <Link href="/forgot" className="font-medium text-green-600 hover:text-green-500">Forgot your password?</Link>
+                <Link href="/forgot" className="font-medium text-green-600 hover:text-green-500 hover:underline">Forgot your password?</Link>
               </div>
             </div>
 

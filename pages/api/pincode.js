@@ -1,4 +1,4 @@
-
-export default function handler(req, res) {
-    res.status(200).json([734003, 110003, 734001, 734004])
+import pincode from '../pincode.json'
+export default async function handler(req, res) {
+    res.status(200).json(pincode)
 }

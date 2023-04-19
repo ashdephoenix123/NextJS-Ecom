@@ -24,7 +24,7 @@ const tshirts = ({ products}) => {
                                     <div className={styles.cardContent}>
                                         <h3>{products[item].category}</h3>
                                         <h2>{products[item].title}</h2>
-                                        <div className={styles.price}>₹{products[item].price}</div>
+                                        <div className={styles.price}>{products[item].availableQty !== 0 ? '₹'+products[item].price : <span className='text-red-700 font-semibold'>Out of Stock</span>}</div>
 
                                         {products[item]["size"].includes('S') && <div className={styles.size}>S</div>}
                                         {products[item]["size"].includes('M') && <div className={styles.size}>M</div>}
@@ -59,14 +59,19 @@ export async function getServerSideProps(context) {
             if (!tshirts[item.title].size.includes(item.size) && item.availableQty > 0) {
                 tshirts[item.title].size.push(item.size);
             }
-        } else {
+        } else {    
             tshirts[item.title] = JSON.parse(JSON.stringify(item));
             if (item.availableQty > 0) {
                 tshirts[item.title].color = [item.color];
                 tshirts[item.title].size = [item.size];
+            }else {
+                tshirts[item.title].color = [];
+                tshirts[item.title].size = [];
             }
         }
     }
+    console.log(tshirts)
+
     return {
         props: { products: JSON.parse(JSON.stringify(tshirts)) }, // will be passed to the page component as props
     }

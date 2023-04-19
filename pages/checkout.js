@@ -3,8 +3,10 @@ import { HiPlusCircle, HiMinusCircle } from 'react-icons/hi'
 import { MdDelete } from 'react-icons/md'
 import Head from 'next/head'
 import Script from 'next/script'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
+const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
     const [address, setAddress] = useState({
         name: "",
         email: "",
@@ -12,12 +14,36 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
         phone: "",
         pincode: "",
         state: "",
-        district: ""
+        city: ""
     });
     const [disabled, setDisabled] = useState(true)
 
-    const updateAddress = (e) => {
+    const updateAddress = async (e) => {
         const { name, value } = e.target;
+
+        if (name === 'pincode' && value.length === 6) {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
+            const data = await response.json();
+            if (Object.keys(data).includes(value)) {
+                setAddress((prev) => {
+                    return {
+                        ...prev,
+                        state: data[value][1],
+                        city: data[value][0]
+                    }
+                })
+
+            } else {
+                setAddress((prev) => {
+                    return {
+                        ...prev,
+                        state: "",
+                        city: ""
+                    }
+                })
+            }
+        }
+
         setAddress(prev => {
             return {
                 ...prev,
@@ -25,13 +51,48 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
             }
         })
     }
+    const getUser = async (token) => {
+        const res = await fetch(`/api/getUser`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+        if (data.found) {
+            setAddress((prev) => {
+                return {
+                    ...prev,
+                    email: data.email
+                }
+            })
+        } else {
+            toast.error("Something went wrong, Please logout and try again.", {
+                position: "top-left",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
+    }
     useEffect(() => {
-        if (address.name.length !== 0 && address.email.length !== 0 && address.address.length !== 0 && address.phone.length === 10 && address.pincode.length === 6 && address.state.length !== 0 && address.district.length !== 0) {
+        const token = localStorage.getItem('usertoken');
+        if (token) {
+            getUser(token);
+        }
+    }, [])
+    useEffect(() => {
+        if (address.name.length !== 0 && address.email.length !== 0 && address.address.length !== 0 && address.phone.length !== 0 && address.pincode.length === 6) {
             setDisabled(false)
         } else {
             setDisabled(true)
         }
-    }, [address.name, address.email, address.address, address.phone, address.pincode, address.state, address.district])
+    }, [address])
 
     let orderID;
     const initiatePayment = async () => {
@@ -40,7 +101,7 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
             headers: {
                 'Content-Type': "application/json"
             },
-            body: JSON.stringify({ subtotal, email: address.email, address: address.address, cart })
+            body: JSON.stringify({ subtotal, email: address.email, address: address.address, cart, phone: address.phone, pincode: address.pincode })
         })
         const data = await res.json();
         if (data.status === 'created') {
@@ -52,7 +113,7 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                 "name": "Sharkk & Co.",
                 "description": "Test Transaction",
                 "image": "/1.png",
-                "order_id": orderID, 
+                "order_id": orderID,
                 "callback_url": `${process.env.NEXT_PUBLIC_HOST}/api/callbackurl`,
                 "prefill": {
                     "name": address.name,
@@ -71,7 +132,17 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
             rzp1.open();
 
         } else {
-            console.log("Something went wrong.")
+            // clearCart();
+            toast.error(data.error, {
+                position: "top-left",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         }
     }
     return (
@@ -83,6 +154,18 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
 
             {/* <Script type="application/javascript" src={`${process.env.NEXT_PUBLIC_PAYTM_STAGING_HOST}/merchantpgpui/checkoutjs/merchants/${process.env.NEXT_PUBLIC_PAYTM_MID}.js`}  crossorigin="anonymous" /> */}
             <div className="container">
+                <ToastContainer
+                    position="top-left"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
                 <section className="text-gray-600 ">
                     <div className="container px-5 py-24 mx-auto">
                         <div className="flex flex-col text-center w-full mb-12">
@@ -100,7 +183,9 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="email" className="leading-7 text-md text-gray-600">Email</label>
-                                        <input type="email" id="email" name="email" value={address.email} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        {usertoken.value !== null ?
+                                            <input type="email" readOnly={true} id="email" name="email" value={address.email} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" /> :
+                                            <input type="email" id="email" name="email" value={address.email} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />}
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-full">
@@ -112,25 +197,25 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="phone" className="leading-7 text-md text-gray-600">Phone</label>
-                                        <input type="number" id="phone" name="phone" value={address.phone} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="number" id="phone" name="phone" maxLength={10} value={address.phone} onChange={updateAddress} placeholder='Enter 10 digit phone number' className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="pincode" className="leading-7 text-md text-gray-600">Pincode</label>
-                                        <input type="number" id="pincode" name="pincode" value={address.pincode} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="number" id="pincode" name="pincode" maxLength={6} value={address.pincode} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                    </div>
+                                </div>
+                                <div className="p-2 md:py-6 w-1/2">
+                                    <div className="">
+                                        <label htmlFor="city" className="leading-7 text-md text-gray-600">City</label>
+                                        <input type="text" id="city" name="city" value={address.city} onChange={updateAddress} readOnly={true} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
                                 <div className="p-2 md:py-6 w-1/2">
                                     <div className="">
                                         <label htmlFor="state" className="leading-7 text-md text-gray-600">State</label>
-                                        <input type="text" id="state" name="state" value={address.state} onChange={updateAddress} readOnly={false} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
-                                    </div>
-                                </div>
-                                <div className="p-2 md:py-6 w-1/2">
-                                    <div className="">
-                                        <label htmlFor="district" className="leading-7 text-md text-gray-600">District</label>
-                                        <input type="text" id="district" name="district" value={address.district} onChange={updateAddress} readOnly={false} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                                        <input type="text" id="state" name="state" value={address.state} onChange={updateAddress} readOnly={true} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
 
@@ -158,6 +243,7 @@ const Checkout = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subt
                                     </ol>
                                 </div>
                                 <button disabled={disabled} onClick={initiatePayment} className='disabled:bg-green-300 mt-6 px-6 py-4 text-white bg-green-500 rounded hover:bg-green-600'>Pay ₹{subtotal} </button>
+                                <div className='mt-6 text-center'>Use <span className='bg-green-500 px-2 text-white -skew-x-6 inline-block'>success@razorpay</span> for successful transaction.</div>
                             </div>
                         </div>
 

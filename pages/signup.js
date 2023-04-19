@@ -35,7 +35,6 @@ const Signup = () => {
       body: JSON.stringify(user)
     })
     const data = await res.json();
-    console.log(data)
 
     if (data.success) {
       toast.success("User have been registered successfully!", {

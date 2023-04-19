@@ -111,7 +111,7 @@ export default function App({ Component, pageProps }) {
     />
     <Navbar logout={logout} usertoken={usertoken} cart={cart} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} />
     <TopMargin />
-    <Component cart={cart} buyNow={buyNow} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />
+    <Component usertoken={usertoken} cart={cart} buyNow={buyNow} addToCart={addToCart} updateCartItem={updateCartItem} clearCart={clearCart} removeItem={removeItem} subtotal={subtotal} {...pageProps} />
     <Footer />
   </>
 }

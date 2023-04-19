@@ -1,10 +1,44 @@
 const Razorpay = require('razorpay')
 import connectDB from "@/middleware/conn"
 import Order from "../../models/Order"
+import Product from "@/models/Product"
+import pincode from '../pincode.json'
 
 export default async function handler(req, res) {
     try {
         if (req.method === 'POST') {
+            if(!Object.keys(pincode).includes(req.body.pincode)){
+                throw new Error('The Pincode you have entered is not serviceable.')
+            }
+
+            await connectDB();
+            //check tampering cart
+            const {cart} = req.body;
+            let sumtotal = 0;
+            for(let item in cart){
+                const productInDB = await Product.findOne({productId: item})
+                sumtotal += cart[item].price * cart[item].quantity;
+                if(cart[item].quantity > productInDB.availableQty){
+                    throw new Error('Some Items in your cart is Out of Stock. Please try again later.')
+                }
+                if(cart[item].price !== productInDB.price){
+                    throw new Error('The Price of some items in your cart have changed. Please try again later.')
+                }
+            }
+            if(sumtotal !== req.body.subtotal){
+                throw new Error('The Price of some items in your cart have changed. Please try again later.')
+            }
+            if(req.body.subtotal <=0){
+                throw new Error('Your Cart is Empty. Please build your cart and try again.')
+            }
+            if(req.body.phone.length !== 10){
+                throw new Error('Please enter your 10 digit Mobile number.')
+            }
+
+            if(req.body.pincode.length !== 6){
+                throw new Error('Please enter a valid Area Pincode.')
+            }
+
 
             let instance = new Razorpay({ key_id: process.env.RAZORPAY_KEYID, key_secret: process.env.RAZORPAY_KEYSECRET })
 
@@ -13,7 +47,6 @@ export default async function handler(req, res) {
                 currency: "INR",
                 receipt: `Receipt: #${Math.floor(Date.now() * Math.random())}`,
             })
-            await connectDB();
             const order = new Order({
                 email: req.body.email,
                 orderID: resp.id,

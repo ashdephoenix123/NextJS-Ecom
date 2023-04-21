@@ -10,7 +10,7 @@ export default async function handler(req, res) {
             const checkToken = await Forgot.findOne({ token })
             if (!checkToken) throw new Error('Request cannot be fulfilled. Please try again later.')
             console.log('hi')
-            const o = await User.findOneAndUpdate({ email: checkToken.email }, { password: CryptoJS.AES.encrypt(newpassword, process.env.CRYPTO_KEY).toString() })
+            await User.findOneAndUpdate({ email: checkToken.email }, { password: CryptoJS.AES.encrypt(newpassword, process.env.CRYPTO_KEY).toString() })
             sgMail.setApiKey(process.env.SENDGRID_API_KEY)
             const msg = {
                 to: checkToken.email, // Change to your recipient

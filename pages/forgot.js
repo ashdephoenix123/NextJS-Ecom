@@ -21,7 +21,7 @@ const Forgot = () => {
             <input type="hidden" name="remember" value="true" />
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
-                <label for="email-address" className="sr-only">Email address</label>
+                <label htmlFor="email-address" className="sr-only">Email address</label>
                 <input id="email-address" name="email" type="email" autoComplete="email" required className="focus:outline-none relative block w-full  py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Email address" />
               </div>
             </div>

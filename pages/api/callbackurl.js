@@ -21,8 +21,8 @@ export default async function handler(req, res) {
                         name: "Sharkk&Co.",
                         email: 'mail@sharkk.studio'
                     }, // Change to your verified sender
-                    subject: 'Sign Up successful',
-                    text: 'Dear User, Your account has been successfully registered with us!',
+                    subject: 'Order Confirmed',
+                    text: 'Your Order is confirmed!',
                     html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
                      <head>

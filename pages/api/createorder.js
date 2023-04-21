@@ -50,7 +50,9 @@ export default async function handler(req, res) {
             const order = new Order({
                 email: req.body.email,
                 orderID: resp.id,
-                address: req.body.address,
+                address: `${req.body.address}, ${req.body.city}, ${req.body.state}, ${req.body.pincode}`,
+                phone: req.body.phone,
+                name: req.body.name,
                 amount: req.body.subtotal,
                 products: req.body.cart
             })

@@ -18,30 +18,34 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
     });
     const [disabled, setDisabled] = useState(true)
 
+    const getPincode = async (value) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
+        const data = await response.json();
+        if (Object.keys(data).includes(value)) {
+            setAddress((prev) => {
+                return {
+                    ...prev,
+                    state: data[value][1],
+                    city: data[value][0]
+                }
+            })
+
+        } else {
+            setAddress((prev) => {
+                return {
+                    ...prev,
+                    state: "",
+                    city: ""
+                }
+            })
+        }
+    }
+
     const updateAddress = async (e) => {
         const { name, value } = e.target;
 
         if (name === 'pincode' && value.length === 6) {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
-            const data = await response.json();
-            if (Object.keys(data).includes(value)) {
-                setAddress((prev) => {
-                    return {
-                        ...prev,
-                        state: data[value][1],
-                        city: data[value][0]
-                    }
-                })
-
-            } else {
-                setAddress((prev) => {
-                    return {
-                        ...prev,
-                        state: "",
-                        city: ""
-                    }
-                })
-            }
+            getPincode(value)
         }
 
         setAddress(prev => {
@@ -64,9 +68,15 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
             setAddress((prev) => {
                 return {
                     ...prev,
-                    email: data.email
+                    name: data.name,
+                    email: data.email,
+                    address: data.address,
+                    pincode: data.pincode,
+                    phone: data.phone
                 }
             })
+            getPincode(data.pincode)
+
         } else {
             toast.error("Something went wrong, Please logout and try again.", {
                 position: "top-left",
@@ -78,6 +88,9 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                 progress: undefined,
                 theme: "light",
             });
+            //Log user out
+            localStorage.clear();
+            window.location = '/'
         }
     }
     useEffect(() => {
@@ -101,7 +114,7 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
             headers: {
                 'Content-Type': "application/json"
             },
-            body: JSON.stringify({ subtotal, email: address.email, address: address.address, cart, phone: address.phone, pincode: address.pincode })
+            body: JSON.stringify({ subtotal, email: address.email, name: address.name, address: address.address, cart, phone: address.phone, pincode: address.pincode, city: address.city, state: address.state })
         })
         const data = await res.json();
         if (data.status === 'created') {
@@ -169,18 +182,18 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                 <section className="text-gray-600 ">
                     <div className="container px-5 py-24 mx-auto">
                         <div className="flex flex-col text-center w-full mb-12">
-                            <h1 className="text-5xl title-font text-gray-900">Checkout</h1>
+                            <h1 className="font-bold text-6xl text-center my-4">Checkout</h1>
                         </div>
-                        <div className="lg:w-2/3 md:w-2/3 mx-auto">
+                        <div className="mx-auto">
                             <h2 className='font-semibold text-3xl mb-5'>1. Delivery Details</h2>
                             <div className="flex flex-wrap -m-2">
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="name" className="leading-7 text-md text-gray-600">Name</label>
                                         <input type="text" id="name" name="name" value={address.name} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="email" className="leading-7 text-md text-gray-600">Email</label>
                                         {usertoken.value !== null ?
@@ -188,31 +201,31 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                                             <input type="email" id="email" name="email" value={address.email} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />}
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-full">
+                                <div className="p-2 w-full">
                                     <div className="">
                                         <label htmlFor="address" className="leading-7 text-md text-gray-600">Address</label>
-                                        <textarea id="address" name="address" value={address.address} onChange={updateAddress} rows={3} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                                        <textarea id="address" name="address" value={address.address} onChange={updateAddress} rows={5} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="phone" className="leading-7 text-md text-gray-600">Phone</label>
                                         <input type="number" id="phone" name="phone" maxLength={10} value={address.phone} onChange={updateAddress} placeholder='Enter 10 digit phone number' className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="pincode" className="leading-7 text-md text-gray-600">Pincode</label>
                                         <input type="number" id="pincode" name="pincode" maxLength={6} value={address.pincode} onChange={updateAddress} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="city" className="leading-7 text-md text-gray-600">City</label>
                                         <input type="text" id="city" name="city" value={address.city} onChange={updateAddress} readOnly={true} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
                                     </div>
                                 </div>
-                                <div className="p-2 md:py-6 w-1/2">
+                                <div className="p-2 sm:w-1/2 w-full">
                                     <div className="">
                                         <label htmlFor="state" className="leading-7 text-md text-gray-600">State</label>
                                         <input type="text" id="state" name="state" value={address.state} onChange={updateAddress} readOnly={true} className="w-full text-2xl mt-1 bg-opacity-50 rounded border border-gray-300 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200 outline-none text-gray-700 py-3 px-3 leading-8 transition-colors duration-200 ease-in-out" />
@@ -221,8 +234,8 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
 
                             </div>
                         </div>
-                        <div className="lg:w-2/3 md:w-2/3 mx-auto">
-                            <h2 className='font-semibold text-3xl my-8'>2. Review Cart Items and Pay</h2>
+                        <div className="mx-auto my-16">
+                            <h2 className='font-semibold text-3xl mb-4'>2. Review Cart Items and Pay</h2>
                             <div className="py-6 w-full">
                                 <div className="w-full text-2xl bg-opacity-50 rounded border border-gray-300  outline-none bg-green-400 text-gray-700 py-8 px-6 leading-8 transition-colors duration-200 ease-in-out">
                                     <ol className=''>

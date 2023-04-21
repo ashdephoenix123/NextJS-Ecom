@@ -1,6 +1,7 @@
 // import connectDB from "@/middleware/conn"
 import jwt from 'jsonwebtoken'
-
+import User from '@/models/User';
+import connectDB from '@/middleware/conn';
 
 export default async function handler(req, res) {
     try {
@@ -10,7 +11,9 @@ export default async function handler(req, res) {
             if(!data){
                 throw new Error('User Not found!')
             }
-            res.status(200).json({email: data.email, found: true})
+            const dbUser = await User.findOne({email: data.email})
+            console.log(dbUser)
+            res.status(200).json({email: data.email, address: dbUser.address, pincode: dbUser.pincode, phone: dbUser.phone, name: dbUser.name, found: true})
         }else {
             throw new Error("Method not allowed.")
         }

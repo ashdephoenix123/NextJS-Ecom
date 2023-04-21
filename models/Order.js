@@ -7,6 +7,8 @@ const OrderSchema = new mongoose.Schema({
     paymentID: {type: String},
     products: {type: Object, required: true},
     address: {type: String, required: true},
+    phone: {type: Number, required: true},
+    name: {type: String, required: true},
     amount: {type: Number, required: true},
     status: {type: String, default: "Pending", required: true},
     deliveryStatus: {type: String, default: "Not delivered", required: true},

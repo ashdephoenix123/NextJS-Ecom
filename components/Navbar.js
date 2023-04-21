@@ -9,6 +9,7 @@ import { MdDelete, MdAccountCircle } from 'react-icons/md'
 
 const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal, usertoken, logout }) => {
     const cartCheckboxRef = useRef();
+    const checkboxRef = useRef();
 
     function unCheck() {
         if (cartCheckboxRef.current) {
@@ -16,11 +17,17 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
         }
     }
 
+    function unCheck2() {
+        if (checkboxRef.current) {
+            checkboxRef.current.checked = false;
+        }
+    }
+
     return (
         <>
             <nav className={styles.nav}>
                 <div className={styles.navigation}>
-                    <input type="checkbox" className={styles.navigation__checkbox} id="navi-toggle" />
+                    <input type="checkbox" ref={checkboxRef} className={styles.navigation__checkbox} id="navi-toggle" />
 
                     <label htmlFor="navi-toggle" className={styles.navigation__button}>
                         <span className={styles.navigation__icon}>&nbsp;</span>
@@ -30,16 +37,38 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
 
                     <div className={styles.navigation__nav}>
                         <ul className={styles.navigation__list}>
-                            <li className={styles.navigation__item}><Link href="/tshirts" className={styles.navigation__link}>Tshirts</Link></li>
-                            <li className={styles.navigation__item}><Link href="/hoodies" className={styles.navigation__link}>Hoodies</Link></li>
-                            <li className={styles.navigation__item}><Link href="/mugs" className={styles.navigation__link}>Mugs</Link></li>
-                            <li className={styles.navigation__item}><Link href="/stickers" className={styles.navigation__link}>Stickers</Link></li>
-                            <li className={styles.navigation__item}><Link href="#" className={styles.navigation__link}>More</Link></li>
+                            <li onClick={unCheck2} className={styles.navigation__item}><Link href="/tshirts" className={styles.navigation__link}>Tshirts</Link></li>
+                            <li onClick={unCheck2} className={styles.navigation__item}><Link href="/hoodies" className={styles.navigation__link}>Hoodies</Link></li>
+                            <li onClick={unCheck2} className={styles.navigation__item}><Link href="/mugs" className={styles.navigation__link}>Mugs</Link></li>
+                            <li onClick={unCheck2} className={styles.navigation__item}><Link href="/stickers" className={styles.navigation__link}>Stickers</Link></li>
+                            {/* <li className={styles.navigation__item}><Link href="#" className={styles.navigation__link}>More</Link></li> */}
+
+
+
+                            {usertoken.value &&
+                                <li className={`${styles.list__item} ${styles.dropdown}`}>
+                                    <div className={`${styles.list__itemLink} ${styles.small}`}><MdAccountCircle size={30} /></div>
+                                    <div className={`${styles.list__item} ${styles.dropdownContent} w-72`} >
+                                        <Link onClick={unCheck2} className={`${styles.list__itemLink3} ${styles.fontdown}`} href='/account'>Account</Link>
+                                        <Link onClick={unCheck2} className={`${styles.list__itemLink3} ${styles.fontdown}`} href='/orders'>Orders</Link>
+                                        <div onClick={()=> {unCheck2(); logout()}} className={`${styles.list__itemLink3}  ${styles.fontdown} cursor-pointer`}>Log Out</div>
+                                    </div>
+                                </li>}
+                            {!usertoken.value &&
+                                <li onClick={unCheck2} className={`${styles.list__item} ${styles.dropdown} `}>
+                                    <Link href="/login">
+                                        <button className="mt-2 bg-green-600 hover:bg-green-700 text-white py-3 px-5 rounded-xl">
+                                            Log In
+                                        </button>
+                                    </Link>
+                                </li>}
                         </ul>
+
+
                     </div>
                 </div>
                 <Link href="/">
-                    <img className={styles.logo} src="/6.png" alt="company logo" />
+                    <img className={`${styles.logo}`} src="/6.png" alt="company logo" />
                 </Link>
                 <form className={styles.search}>
                     <input type="text" className={styles.search__input} placeholder="Search for products, brands and more" />
@@ -53,18 +82,18 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                     <li className={`${styles.list__item} ${styles.dropdown}`}>
                         <div className={styles.list__itemLink}>All Products<IoMdArrowDropup className={styles.upIcon} size={15} /></div>
                         <div className={`${styles.list__item} ${styles.dropdownContent}`} >
-                            <Link  className={styles.list__itemLink3} href='/tshirts'>T-Shirts</Link>
-                            <Link  className={styles.list__itemLink3} href='/hoodies'>Hoodies</Link>
-                            <Link  className={styles.list__itemLink3} href='/mugs'>Mugs</Link>
-                            <Link  className={styles.list__itemLink3} href='/stickers'>Stickers</Link>
+                            <Link className={styles.list__itemLink3} href='/tshirts'>T-Shirts</Link>
+                            <Link className={styles.list__itemLink3} href='/hoodies'>Hoodies</Link>
+                            <Link className={styles.list__itemLink3} href='/mugs'>Mugs</Link>
+                            <Link className={styles.list__itemLink3} href='/stickers'>Stickers</Link>
                         </div>
                     </li>
 
-                    <li className={styles.list__item}>
+                    {/* <li className={styles.list__item}>
                         <div className={styles.list__itemLink}>
                             <img width={100} height={100} className={styles.darkMode} src="/darkMode.png" alt="" />
                         </div>
-                    </li>
+                    </li> */}
                     {usertoken.value &&
                         <li className={`${styles.list__item} ${styles.dropdown}`}>
                             <div className={styles.list__itemLink}><MdAccountCircle size={30} /><IoMdArrowDropup className={styles.upIcon} size={15} /></div>

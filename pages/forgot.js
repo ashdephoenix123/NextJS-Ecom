@@ -29,8 +29,30 @@ const Forgot = () => {
   }
 
   const changePassinDB = async () => {
-    if (newPassword.password !== newPassword.cpassword) {
+    if (!newPassword.password) {
+      toast.error("Password field cannot be Empty!", {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else if (newPassword.password !== newPassword.cpassword) {
       toast.error("Password and Confirm password did not match!", {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else if (newPassword.password.length < 8) {
+      toast.error("Password length shouold be 8 characters or long!", {
         position: "top-left",
         autoClose: 3000,
         hideProgressBar: false,
@@ -60,6 +82,10 @@ const Forgot = () => {
           progress: undefined,
           theme: "light",
         });
+        setNewPassword({
+          password: "",
+          cpassword: ""
+        })
       } else {
         toast.error(data.error, {
           position: "top-left",

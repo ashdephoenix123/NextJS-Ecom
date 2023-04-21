@@ -208,7 +208,6 @@ export async function getServerSideProps(context) {
         }
     }
     const variants = await ProductModel.find({ title: findProduct.title, category: findProduct.category })
-    console.log(variants)
     const colorsCollection = {};
     for (let item of variants) {
         if (colorsCollection[item.color]) {

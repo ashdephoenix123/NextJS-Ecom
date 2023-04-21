@@ -70,7 +70,6 @@ export async function getServerSideProps(context) {
             }
         }
     }
-    console.log(tshirts)
 
     return {
         props: { products: JSON.parse(JSON.stringify(tshirts)) }, // will be passed to the page component as props

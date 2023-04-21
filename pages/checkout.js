@@ -125,7 +125,7 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                 "currency": "INR",
                 "name": "Sharkk & Co.",
                 "description": "Test Transaction",
-                "image": "/1.png",
+                "image": "/fav.png",
                 "order_id": orderID,
                 "callback_url": `${process.env.NEXT_PUBLIC_HOST}/api/callbackurl`,
                 "prefill": {

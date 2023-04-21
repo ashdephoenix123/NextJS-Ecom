@@ -12,7 +12,6 @@ export default async function handler(req, res) {
                 throw new Error('User Not found!')
             }
             const dbUser = await User.findOne({email: data.email})
-            console.log(dbUser)
             res.status(200).json({email: data.email, address: dbUser.address, pincode: dbUser.pincode, phone: dbUser.phone, name: dbUser.name, found: true})
         }else {
             throw new Error("Method not allowed.")

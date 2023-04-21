@@ -60,6 +60,7 @@ const Forgot = () => {
           progress: undefined,
           theme: "light",
         });
+        router.push('/login')
       } else {
         toast.error(data.error, {
           position: "top-left",

@@ -10,7 +10,6 @@ export default async function handler(req, res) {
             const findUser = await User.findOne({ email: req.body.email })
             if (!findUser) throw new Error('User not registered! Please Sign up!')
             const token = Math.random().toString(36).substring(2) + Date.now();
-            console.log(token)
             const forgot = new Forgot({
                 email: req.body.email,
                 token: token

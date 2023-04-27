@@ -1,5 +1,6 @@
 import Forgot from "@/models/Forgot";
 import User from "@/models/User";
+import connectDB from "@/middleware/conn";
 const CryptoJS = require("crypto-js");
 const sgMail = require('@sendgrid/mail')
 
@@ -7,6 +8,7 @@ export default async function handler(req, res) {
     try {
         if (req.method === 'POST') {
             const { newpassword, token } = req.body;
+            await connectDB();
             const checkToken = await Forgot.findOne({ token })
             if (!checkToken) throw new Error('Request cannot be fulfilled. Please try again later.')
             await User.findOneAndUpdate({ email: checkToken.email }, { password: CryptoJS.AES.encrypt(newpassword, process.env.CRYPTO_KEY).toString() })

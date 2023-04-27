@@ -8,13 +8,13 @@ const Mugs = ({ products }) => {
     return (
         <>
             <section className="container">
-                <h2 className={styles.productTitle}>Top Mugs Collection</h2>
+                <h2 className={styles.productTitle}>Top SweatShirts Collection</h2>
                 <div className={styles.test}>
                     {/* <div className={styles.left}>
                         filters
                     </div> */}
                     <div className={styles.allCards}>
-                        {Object.keys(products).length === 0 && <p className='italic'>No Mugs to display Or they are currently Out of Stock. Please try again later.</p>}
+                        {Object.keys(products).length === 0 && <p className='italic'>No SweatShirts to display Or they are currently Out of Stock. Please try again later.</p>}
                         {Object.keys(products).map((item) => {
                             return <Link key={products[item]._id} href={`/products/${products[item].productId}`}>
                                 <div className={styles.card}>

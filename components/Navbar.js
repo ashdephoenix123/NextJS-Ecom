@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import Link from 'next/link'
 import styles from '../styles/Navbar.module.scss'
 import { IoMdArrowDropup } from 'react-icons/io'
@@ -6,10 +6,15 @@ import { AiOutlineShoppingCart } from 'react-icons/ai'
 import { HiPlusCircle, HiMinusCircle } from 'react-icons/hi'
 import { BsFillBagFill } from 'react-icons/bs'
 import { MdDelete, MdAccountCircle } from 'react-icons/md'
+import { useRouter } from 'next/router'
+import Error from 'next/error'
 
 const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtotal, usertoken, logout }) => {
     const cartCheckboxRef = useRef();
     const checkboxRef = useRef();
+    const router = useRouter();
+
+    const [searchText, setSearchText] = useState("");
 
     function unCheck() {
         if (cartCheckboxRef.current) {
@@ -20,6 +25,25 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
     function unCheck2() {
         if (checkboxRef.current) {
             checkboxRef.current.checked = false;
+        }
+    }
+
+    const searchDB = async (e) => {
+        e.preventDefault();
+        if (searchText !== "") {
+            if (searchText === "tshirts" || searchText === "Tshirts" || searchText === "tshirt" || searchText === "Tshirt" || searchText === "t-shirts" || searchText === "T-shirts" || searchText === "t-shirt" || searchText === "T-shirt") {
+                router.push('/tshirts')
+            } else if (searchText === "hoodies" || searchText === "Hoodies" || searchText === "hoodie" || searchText === "Hoodie") {
+                router.push('/hoodies')
+            } else if (searchText === "mugs" || searchText === "Mugs" || searchText === "mug" || searchText === "Mug") {
+                router.push('/mugs')
+            } else if (searchText === "stickers" || searchText === "Stickers" || searchText === "sticker" || searchText === "Sticker") {
+                router.push('/stickers')
+            } else if (searchText === "sweatshirts" || searchText === "Sweatshirts" || searchText === "sweatshirt" || searchText === "Sweatshirt") {
+                router.push('/sweatshirts')
+            } else {
+                router.push('/notFound')
+            }
         }
     }
 
@@ -51,7 +75,7 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                                     <div className={`${styles.list__item} ${styles.dropdownContent} w-72`} >
                                         <Link onClick={unCheck2} className={`${styles.list__itemLink3} ${styles.fontdown}`} href='/account'>Account</Link>
                                         <Link onClick={unCheck2} className={`${styles.list__itemLink3} ${styles.fontdown}`} href='/orders'>Orders</Link>
-                                        <div onClick={()=> {unCheck2(); logout()}} className={`${styles.list__itemLink3}  ${styles.fontdown} cursor-pointer`}>Log Out</div>
+                                        <div onClick={() => { unCheck2(); logout() }} className={`${styles.list__itemLink3}  ${styles.fontdown} cursor-pointer`}>Log Out</div>
                                     </div>
                                 </li>}
                             {!usertoken.value &&
@@ -70,8 +94,8 @@ const Navbar = ({ cart, addToCart, updateCartItem, clearCart, removeItem, subtot
                 <Link href="/">
                     <img className={`${styles.logo}`} src="/6.png" alt="company logo" />
                 </Link>
-                <form className={styles.search}>
-                    <input type="text" className={styles.search__input} placeholder="Search for products, brands and more" />
+                <form className={styles.search} onSubmit={searchDB}>
+                    <input type="text" name='search' value={searchText} onChange={(e) => setSearchText(e.target.value)} className={styles.search__input} placeholder="Search for products, brands and more" />
                     <button className={styles.search__button}>
                         <svg className={styles.search__icon}>
                             <use xlinkHref="sprite.svg#icon-magnifying-glass"></use>

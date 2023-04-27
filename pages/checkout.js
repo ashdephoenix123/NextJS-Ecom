@@ -5,6 +5,7 @@ import Head from 'next/head'
 import Script from 'next/script'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, removeItem, subtotal }) => {
     const [address, setAddress] = useState({
@@ -17,6 +18,11 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
         city: ""
     });
     const [disabled, setDisabled] = useState(true)
+    const [verified, setVerified] = useState(true)
+
+    function onChange() {
+        setVerified(false)
+    }
 
     const getPincode = async (value) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`);
@@ -255,7 +261,12 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                                         <div className='mt-4'>Total: ₹{subtotal}</div>
                                     </ol>
                                 </div>
-                                <button disabled={disabled} onClick={initiatePayment} className='disabled:bg-green-300 mt-6 px-6 py-4 text-white bg-green-500 rounded hover:bg-green-600'>Pay ₹{subtotal} </button>
+                                <ReCAPTCHA
+                                    sitekey={process.env.NEXT_PUBLIC_GOOGLE_SITE_KEY}
+                                    type='image'
+                                    onChange={onChange}
+                                />
+                                <button disabled={disabled || verified} onClick={initiatePayment} className='disabled:bg-green-300 mt-6 px-6 py-4 text-white bg-green-500 rounded hover:bg-green-600'>Pay ₹{subtotal} </button>
                                 <div className='mt-6 text-center'>Use <span className='bg-green-500 px-2 text-white -skew-x-6 inline-block'>success@razorpay</span> for successful transaction.</div>
                             </div>
                         </div>

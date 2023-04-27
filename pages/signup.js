@@ -127,7 +127,7 @@ const Signup = () => {
               </div> */}
             </div>
             <ReCAPTCHA
-              sitekey={process.env.GOOGLE_SITE_KEY}
+              sitekey={process.env.NEXT_PUBLIC_GOOGLE_SITE_KEY}
               type='image'
               onChange={onChange}
             />

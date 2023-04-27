@@ -62,7 +62,7 @@ const Contact = () => {
             </div>
             <ReCAPTCHA
             width='fit-content'
-              sitekey="6LfuOsElAAAAAGL3UYcE6hvl8HxwR7Rqq5w9sm5-"
+              sitekey={process.env.GOOGLE_SITE_KEY}
               type='image'
               onChange={onChange}
             />

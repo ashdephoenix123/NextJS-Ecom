@@ -4,16 +4,25 @@ import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
+import ReCAPTCHA from "react-google-recaptcha";
+import Script from 'next/script';
+
 
 const Signup = () => {
 
   const router = useRouter();
+
+  const [verified, setVerified] = useState(true)
 
   const [user, setUser] = useState({
     name: "",
     email: "",
     password: ""
   })
+  function onChange(value) {
+    console.log("Captcha value:", value);
+    setVerified(false)
+  }
 
   const updateUser = (e) => {
     const { name, value } = e.target;
@@ -66,14 +75,15 @@ const Signup = () => {
     }
   }
 
-  useEffect(()=> {
-    if(localStorage.getItem('usertoken')){
+  useEffect(() => {
+    if (localStorage.getItem('usertoken')) {
       router.push('/')
     }
   }, [])
 
   return (
     <>
+      {/* <Script src="https://www.google.com/recaptcha/api.js" /> */}
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-2">
         <ToastContainer
           position="top-left"
@@ -116,9 +126,14 @@ const Signup = () => {
                 <input id="cpassword" name="cpassword" type="password" autoComplete="current-password" required className="focus:outline-none relative block w-full rounded-b-md border-0 py-4 px-2 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-md sm:leading-6" placeholder="Confirm Password" />
               </div> */}
             </div>
+            <ReCAPTCHA
+              sitekey="6LfuOsElAAAAAGL3UYcE6hvl8HxwR7Rqq5w9sm5-"
+              type='image'
+              onChange={onChange}
+            />
 
             <div>
-              <button type="submit" className=" group relative flex w-full justify-center rounded-md bg-green-600 py-4 px-2  text-md font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+              <button disabled={verified} type="submit" className="disabled:bg-green-300 group relative flex w-full justify-center rounded-md bg-green-600 py-4 px-2  text-md font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
                 Create new account
               </button>
             </div>

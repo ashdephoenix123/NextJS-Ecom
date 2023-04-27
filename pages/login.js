@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
+import ReCAPTCHA from "react-google-recaptcha";
+import Script from 'next/script';
 
 const Login = () => {
   const router = useRouter();
@@ -10,6 +12,7 @@ const Login = () => {
     email: "",
     password: ""
   })
+  const [verified, setVerified] = useState(true)
 
   const updateUser = (e) => {
     const { name, value } = e.target;
@@ -19,6 +22,10 @@ const Login = () => {
         [name]: value
       }
     })
+  }
+  function onChange(value) {
+    console.log("Captcha value:", value);
+    setVerified(false)
   }
   const submitUser = async (e) => {
     e.preventDefault();
@@ -72,6 +79,7 @@ const Login = () => {
   }, [])
   return (
     <>
+      {/* <Script src="https://www.google.com/recaptcha/api.js" /> */}
       <div className="flex min-h-full items-center justify-center px-4 py-16 sm:px-6 lg:px-8 my-2">
         <ToastContainer
           position="top-left"
@@ -116,7 +124,12 @@ const Login = () => {
             </div>
 
             <div>
-              <button type="submit" className="group relative flex w-full justify-center rounded-md bg-green-600 py-4 px-2  text-md font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+            <ReCAPTCHA
+              sitekey="6LfuOsElAAAAAGL3UYcE6hvl8HxwR7Rqq5w9sm5-"
+              type='image'
+              onChange={onChange}
+            />
+              <button disabled={verified} type="submit" className="mt-2 group relative flex w-full justify-center rounded-md bg-green-600 py-4 px-2  text-md font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 disabled:bg-green-300">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <svg className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />

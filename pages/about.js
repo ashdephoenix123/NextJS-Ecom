@@ -1,5 +1,6 @@
 import React from 'react'
 import Head from 'next/head'
+import Image from 'next/image'
 
 const About = () => {
   return (
@@ -10,7 +11,23 @@ const About = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="fav.png" />
       </Head>
-      <div>About</div>
+      <div className="container">
+        <p className='italic text-5xl font-semibold mb-8'>About Us</p>
+        <div className="block md:flex">
+          <p className='flex-auto md:w-1/4 mr-6'>Welcome to Sharkk&Co, <br/> Your <span className='font-semibold underline'>No. 1</span> source for all types of T-shirts & clothing fashionistore. We&apos;re dedicated to providing you the very best of our products, with an emphasis on top quality, fast shipping & at pocket free price.<br/>
+
+            Founded in 2023 by Akash Sarki, Sharkk&Co. has come a long way from its beginnings in Siliguri, West Bengal, India. When he first started out, his passion for eco-friendly products drove them to start their own business.
+
+            We hope you enjoy our products as much as we enjoy offering them to you. If you have any questions or comments, please don’t hesitate to contact us.
+    <br/><br/>
+            Sincerely,
+<br/>
+            Akash Sarki!</p>
+          <div className='mt-6 md:w-1/2 md:mt-0 flex justify-center'>
+            <Image src="/homeImage1.jpg" width={1000} height={1000} className='flex-auto object-cover' alt='image' />
+          </div>
+        </div>
+      </div>
     </>
   )
 }

@@ -244,7 +244,7 @@ const Checkout = ({ usertoken, cart, addToCart, updateCartItem, clearCart, remov
                             <h2 className='font-semibold text-3xl mb-4'>2. Review Cart Items and Pay</h2>
                             <div className="py-6 w-full">
                                 <div className="w-full text-2xl bg-opacity-50 rounded border border-gray-300  outline-none bg-green-400 text-gray-700 py-8 px-6 leading-8 transition-colors duration-200 ease-in-out">
-                                    <ol className=''>
+                                    <ol className='mb-4'>
                                         {Object.keys(cart).length === 0 && <li className='text-2xl p-0 m-0'>Your Cart is Empty!</li>}
                                         {Object.keys(cart).map((item, index) => {
                                             return <li key={item} className='flex justify-between mb-6'>
